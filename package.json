@@ -1,0 +1,11 @@
+{
+  "name": "css-to-styled-components",
+  "version": "1.0.0",
+  "description": "Transpile css to styled-components",
+  "main": "index.js",
+  "author": "Tsuyoshi HARA<chloe463@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "postcss": "^8.1.3"
+  }
+}
