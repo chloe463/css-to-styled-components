@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`traverse can transform css decl to styled-components transform variable decl 1`] = `"const color = \\"black\\";"`;
+
+exports[`traverse can transform css rule to styled-components with element 1`] = `
+"const Message = styled.p
+  background-color: rgba(0, 0, 0, 0.86);
+  color: rgb(255, 255, 255);
+\`;"
+`;
+
+exports[`traverse can transform css rule to styled-components with no element 1`] = `
+"const Klass = styled.div
+  background-color: rgba(0, 0, 0, 0.86);
+  color: rgb(255, 255, 255);
+\`;"
+`;
