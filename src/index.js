@@ -1,10 +1,11 @@
 var fs = require("fs");
-var util = require("util");
 var postcss = require("postcss");
+var { capitalize, kebabToCamel, snakeToCamel } = require("./utils/cases");
 
 const filePath = process.argv[2];
 
 if (!filePath) {
+  console.error(`Please give a css file name.`);
   process.exit(1);
 }
 
@@ -18,14 +19,6 @@ const scss = fs.readFileSync(filePath, "utf8").replace(/\s*\/\/.*/g, "");
 const ast = postcss.parse(scss);
 
 const sources = ast.source.input.css.split("\n");
-
-const capitalize = (s) => {
-  return s[0].toUpperCase() + s.slice(1);
-};
-
-const hyphenCaseToCamelCase = (s) => {
-  return s.replace(/-([a-z])/g, (_, v) => v.toUpperCase());
-};
 
 const result = ast.nodes.map(node => {
   if (node.type === "atrule" && node.name === "import") {
@@ -63,7 +56,7 @@ console.log(
     .replace(/composes:\s*([a-zA-Z0-9-]+)(\sfrom.*)?/g, (match, p) => {
       return [
         `// ${match}`,
-        "  ${" + p.replace(/-([a-z])/g, (_, p) => p.toUpperCase()) + "}",
+        "  ${" + snakeToCamel(kebabToCamel(p)) + "}",
       ].join("\n");
     })
 );
