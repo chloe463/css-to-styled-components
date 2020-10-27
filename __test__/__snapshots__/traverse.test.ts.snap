@@ -2,6 +2,17 @@
 
 exports[`traverse can transform css decl to styled-components transform variable decl 1`] = `"const color = \\"black\\";"`;
 
+exports[`traverse can transform css rule to styled-components keyframes 1`] = `
+"const Anim = keyframes\`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+\`;"
+`;
+
 exports[`traverse can transform css rule to styled-components nested rules 1`] = `
 "const Container = styled.div\`
   background-color: rgba(0, 0, 0, 0.86);

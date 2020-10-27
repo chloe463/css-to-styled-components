@@ -1,10 +1,35 @@
 import { ChildNode } from "postcss";
 import { capitalize } from "./utils/cases";
 
+const buildDefinition = (name: string, styledCpFn: string, declarations: string[], indentLevel = 0) => {
+  let indent = "  ";
+  if (indentLevel) {
+    indent = Array.from({ length: indentLevel * 2 }, _ => " ").join("");
+    return [
+      `${name} {`,
+      declarations.map(d => `  ${indent}${d}`).join("\n"),
+      `${indent}}`,
+    ].join("\n");
+  }
+  return [
+    `const ${capitalize(name)} = ${styledCpFn}\``,
+    declarations.map(d => `${indent}${d}`).join("\n"),
+    `\`;`,
+  ].join("\n");
+};
+
 export const traverse = (node: ChildNode, indentLevel = 0) => {
   switch (node.type) {
     case "atrule": {
-      return;
+      if (node.name === "keyframes") {
+        const declarations: string[] = node.nodes.map(v => traverse(v, indentLevel+1));
+        const name = node.params;
+        return buildDefinition(name, "keyframes", declarations, indentLevel);
+      } else if (node.name === "media") {
+        // TODO
+        return "";
+      }
+      return "";
     }
     case "decl": {
       if (node.prop.match(/^\$[a-zA-Z0-9]+/)) {
@@ -13,25 +38,13 @@ export const traverse = (node: ChildNode, indentLevel = 0) => {
       return `${node.prop}: ${node.value};`;
     }
     case "rule": {
-      const declarations: (string | undefined)[] = node.nodes.map(v => traverse(v, indentLevel+1));
+      const declarations: string[] = node.nodes.map(v => traverse(v, indentLevel+1));
       let [element, name] = node.selector.split(/\.|#/);
       const styledFnType = `styled.${element || "div"}`;
-      if (indentLevel) {
-        const indent = Array.from({ length: indentLevel * 2 }, _ => " ").join("");
-        return [
-          `${node.selector} {`,
-          declarations.map(d => `  ${indent}${d}`).join("\n"),
-          `${indent}}`,
-        ].join("\n");
-      }
-      return [
-        `const ${capitalize(name)} = ${styledFnType}\``,
-        declarations.map(d => `  ${d}`).join("\n"),
-        `\`;`,
-      ].join("\n");
+      return buildDefinition(indentLevel ? node.selector : name, styledFnType, declarations, indentLevel);
     }
     case "comment": {
-      return;
+      return "";
     }
   }
 };

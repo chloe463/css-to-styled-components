@@ -1,4 +1,4 @@
-import { Declaration, Rule } from "postcss";
+import { AtRule, Declaration, Rule } from "postcss";
 import { traverse } from "../src/traverse";
 
 describe("traverse", () => {
@@ -78,5 +78,28 @@ describe("traverse", () => {
       const result = traverse(node);
       expect(result).toMatchSnapshot();
     });
+
+    it ("keyframes", () => {
+      const node = new AtRule({
+        name: "keyframes",
+        params: "anim",
+        nodes: [
+          new Rule({
+            selector: "0%",
+            nodes: [
+              new Declaration({ prop: "opacity", value: "0" }),
+            ],
+          }),
+          new Rule({
+            selector: "100%",
+            nodes: [
+              new Declaration({ prop: "opacity", value: "1" }),
+            ],
+          })
+        ]
+      });
+      const result = traverse(node);
+      expect(result).toMatchSnapshot();
+    })
   });
 });
