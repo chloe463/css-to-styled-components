@@ -1,6 +1,6 @@
 import fs from "fs";
 import postcss from "postcss";
-import { capitalize, kebabToCamel, snakeToCamel } from "./utils/cases";
+import { traverse } from './traverse';
 
 const filePath = process.argv[2];
 
@@ -23,48 +23,51 @@ if (!ast || !ast.source) {
   process.exit(1);
 }
 
-const sources = ast.source.input.css.split("\n");
+const result = ast.nodes.map((node) => traverse(node, 0));
+console.log(result.join("\n"));
 
-const result = ast.nodes.map(node => {
-  if (node.type === "atrule" && node.name === "import") {
-    return;
-  }
+// const sources = ast.source.input.css.split("\n");
 
-  let name = "";
-  let styledFnType = `styled.div\``;
-  let defs: string[] = [];
-  if (node.type === "atrule" && node.name === "keyframes") {
-    styledFnType = `keyframes\``;
-  } else if (node.type === "rule") {
-    name = node.selector
-      .replace(/^\./g, "")
-      .replace(/-([a-z])/g, (_, p) => p.toUpperCase());
+// const result = ast.nodes.map(node => {
+//   if (node.type === "atrule" && node.name === "import") {
+//     return;
+//   }
 
-    const start = node.source?.start?.line;
-    const end = node.source?.end?.line;
-    defs = start && end ? sources.slice(start, end - 1) : [];
-  } else if (node.type === "decl") {
-    return ["const", node.prop.replace(/^\$/, ""), "=", `"${node.value}";`].join(" ");
-  }
+//   let name = "";
+//   let styledFnType = `styled.div\``;
+//   let defs: string[] = [];
+//   if (node.type === "atrule" && node.name === "keyframes") {
+//     styledFnType = `keyframes\``;
+//   } else if (node.type === "rule") {
+//     name = node.selector
+//       .replace(/^\./g, "")
+//       .replace(/-([a-z])/g, (_, p) => p.toUpperCase());
 
-  return [
-    `const ${capitalize(name)} = ${styledFnType}`,
-    ...defs,
-    `\``,
-  ].join("\n");
-});
+//     const start = node.source?.start?.line;
+//     const end = node.source?.end?.line;
+//     defs = start && end ? sources.slice(start, end - 1) : [];
+//   } else if (node.type === "decl") {
+//     return ["const", node.prop.replace(/^\$/, ""), "=", `"${node.value}";`].join(" ");
+//   }
 
-console.log(
-  result
-    .join("\n")
-    .replace(/:.*\s+\$(.*)\;/g, (_, p) => {
-      const cameled = p.replace(/-([a-z])/g, (_: number, p: string) => p.toUpperCase());
-      return `: \${${cameled}};`;
-    })
-    .replace(/composes:\s*([a-zA-Z0-9-]+)(\sfrom.*)?/g, (match, p) => {
-      return [
-        `// ${match}`,
-        "  ${" + snakeToCamel(kebabToCamel(p)) + "}",
-      ].join("\n");
-    })
-);
+//   return [
+//     `const ${capitalize(name)} = ${styledFnType}`,
+//     ...defs,
+//     `\``,
+//   ].join("\n");
+// });
+
+// console.log(
+//   result
+//     .join("\n")
+//     .replace(/:.*\s+\$(.*)\;/g, (_, p) => {
+//       const cameled = p.replace(/-([a-z])/g, (_: number, p: string) => p.toUpperCase());
+//       return `: \${${cameled}};`;
+//     })
+//     .replace(/composes:\s*([a-zA-Z0-9-]+)(\sfrom.*)?/g, (match, p) => {
+//       return [
+//         `// ${match}`,
+//         "  ${" + snakeToCamel(kebabToCamel(p)) + "}",
+//       ].join("\n");
+//     })
+// );
