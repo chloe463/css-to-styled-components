@@ -43,7 +43,7 @@ describe("traverse", () => {
             selector: "&:hover",
             nodes: [
               new Declaration({ prop: "background-color", value: "rgba(0, 0, 0, 0.74)" }),
-              new Declaration({ prop: "color", value: "rgb(250, 250, 250)" }),
+              new Declaration({ prop: "color", value: "$white-alpha500" }),
             ],
           }),
           new Rule({

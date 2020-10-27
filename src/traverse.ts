@@ -1,5 +1,6 @@
 import { ChildNode } from "postcss";
 import { capitalize } from "./utils/cases";
+import { transformVariable } from "./utils/transformVar";
 
 const buildDefinition = (name: string, styledCpFn: string, declarations: string[], indentLevel = 0) => {
   let indent = "  ";
@@ -35,7 +36,7 @@ export const traverse = (node: ChildNode, indentLevel = 0) => {
       if (node.prop.match(/^\$[a-zA-Z0-9]+/)) {
         return `const ${node.prop.replace("$", "")} = "${node.value}";`;
       }
-      return `${node.prop}: ${node.value};`;
+      return `${node.prop}: ${transformVariable(node.value)};`;
     }
     case "rule": {
       const declarations: string[] = node.nodes.map(v => traverse(v, indentLevel+1));
