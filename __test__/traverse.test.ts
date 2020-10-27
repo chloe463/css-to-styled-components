@@ -75,7 +75,6 @@ describe("traverse", () => {
           }),
         ]
       });
-      console.log(node.toString());
       const result = traverse(node);
       expect(result).toMatchSnapshot();
     });
