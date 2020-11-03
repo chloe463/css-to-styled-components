@@ -1,4 +1,5 @@
-import { ChildNode } from "postcss";
+import type { ChildNode } from "postcss";
+import type { Node } from "scss-parser";
 import { capitalize } from "./utils/cases";
 import { transformVariable } from "./utils/transformVar";
 
@@ -47,5 +48,21 @@ export const traverse = (node: ChildNode, indentLevel = 0) => {
     case "comment": {
       return "";
     }
+  }
+};
+
+export const traverse2 = (node: Node): string => {
+  if (Array.isArray(node.value)) {
+    return node.value.map((v) => {
+      switch(v.type) {
+        case "rule": {
+          return traverse2(v);
+        }
+        case "atrule": {
+        }
+      }
+    }).join("");
+  } else {
+    return node.value;
   }
 };

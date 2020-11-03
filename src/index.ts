@@ -1,6 +1,8 @@
 import fs from "fs";
-import postcss from "postcss";
-import { traverse } from './traverse';
+// import postcss from "postcss";
+import { parse } from "scss-parser";
+import util from "util";
+import { walkNode } from "./traverse2";
 
 const filePath = process.argv[2];
 
@@ -16,15 +18,20 @@ if (!fs.existsSync(filePath)) {
 
 const scss = fs.readFileSync(filePath, "utf8").replace(/\s*\/\/.*/g, "");
 
-const ast = postcss.parse(scss);
+const ast2 = parse(scss);
+console.log(util.inspect(ast2, { depth: 1000, colors: true }));
+const r = walkNode(ast2);
+console.log(r);
+process.exit(0)
+// const ast = postcss.parse(scss);
 
-if (!ast || !ast.source) {
-  console.error(`Failed to parse file content. The given file is invalid css file.`);
-  process.exit(1);
-}
+// if (!ast || !ast.source) {
+//   console.error(`Failed to parse file content. The given file is invalid css file.`);
+//   process.exit(1);
+// }
 
-const result = ast.nodes.map((node) => traverse(node, 0));
-console.log(result.join("\n"));
+// const result = ast.nodes.map((node) => traverse(node, 0));
+// console.log(result.join("\n"));
 
 // const sources = ast.source.input.css.split("\n");
 
